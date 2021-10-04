@@ -11,21 +11,27 @@ def get_reddit_histo(after, before, subreddit, limit):
 	before = int(dt.datetime.strptime(before, '%Y-%m-%d %H:%M:%S').timestamp())
 	# get data from PushShiftAPI
 	api = PushshiftAPI()
-	data = list(api.search_submissions(after=after,
+	submissions_gen = api.search_submissions(after=after,
 							before=before,
                             subreddit=subreddit,
                             filter=['url','author', 'title', 'subreddit'],
-                            limit=limit))
+                            limit=limit)
+	data = pd.DataFrame([attribute.d_ for attribute in submissions_gen])
+
 	return data
 
 
 # Description: gets recent X mins of data from reddit
-def get_reddit_recent(minutes):
+def get_reddit_recent(minutes, subreddit):
 	# convert to datetime/epoch
-	after=int((dt.datetime.now() - dt.timedelta(minutes=minutes)).timestamp())
+	api = PushshiftAPI()
+	after = int((dt.datetime.now() - dt.timedelta(minutes=minutes)).timestamp())
 	# get data from PushShiftAPI
-	data = list(api.search_submissions(after=after,
+	submissions_gen = api.search_submissions(after=after,
                             subreddit=subreddit,
                             filter=['url','author', 'title', 'subreddit'],
-                            limit=1000))
+                            limit=1000)
+	data = pd.DataFrame([attribute.d_ for attribute in submissions_gen])
+
 	return data
+
